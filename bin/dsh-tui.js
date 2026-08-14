@@ -5,10 +5,8 @@
 import { spawn } from 'node:child_process'
 
 const args = ['--yes', '@deepseek-ai/dsh', '--profile', 'tui', ...process.argv.slice(2)]
-const child = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', args, {
-  stdio: 'inherit',
-  shell: process.platform === 'win32',
-})
+// Node >= 18 runs .cmd files directly; no shell, so no arg-concatenation warning.
+const child = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', args, { stdio: 'inherit' })
 child.on('error', (error) => {
   process.stderr.write('dsh-tui: failed to launch dsh: ' + error.message + '\n')
   process.exit(1)
