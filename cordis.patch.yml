@@ -1,0 +1,16 @@
+# deepseek-harness-tui bundle patch: the terminal UI over the dsh-base layer.
+# Applied after dsh-base's insert. Rows reference this package by name, so the
+# package must be resolvable from the profile (installed via
+# `dsh plugin --profile tui add <this-dir>`, which links it into the profile's
+# node_modules) — or the profile's own patch may restate these rows with
+# absolute module paths (the zero-install bootstrap used before pnpm exists).
+
+- insert:
+    - id: tui-startup
+      name: 'deepseek-harness-tui/startup'
+
+    - id: tui-app
+      name: 'deepseek-harness-tui'
+      config:
+        sidebar: true
+        showReasoning: true

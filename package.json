@@ -1,0 +1,72 @@
+{
+  "name": "deepseek-harness-tui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A terminal UI (TUI) for DeepSeek Harness — an opencode-inspired chat client that boots as a dsh profile app plugin.",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./startup": "./lib/startup.js"
+  },
+  "bin": {
+    "dsh-tui": "bin/dsh-tui.js"
+  },
+  "files": [
+    "lib",
+    "bin",
+    "cordis.patch.yml"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "*",
+    "@deepseek-ai/dsh-agent": "*",
+    "@deepseek-ai/dsh-agent-loop": "*",
+    "@deepseek-ai/dsh-commands": "*",
+    "@deepseek-ai/dsh-cmdline": "*",
+    "@deepseek-ai/dsh-llm": "*",
+    "@deepseek-ai/dsh-session": "*",
+    "@deepseek-ai/dsh-session-persistence": "*",
+    "@deepseek-ai/dsh-user-approval": "*"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dependencies": {
+    "commander": "^15.0.0",
+    "@deepseek-ai/schemastery": "^0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": false
+    },
+    "@deepseek-ai/dsh-agent": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-agent-loop": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-commands": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-cmdline": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-llm": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-session": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-session-persistence": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-user-approval": {
+      "optional": true
+    }
+  }
+}
