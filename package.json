@@ -19,7 +19,8 @@
     "lib",
     "bin",
     "cordis.patch.yml",
-    "docs/用户手册.md"
+    "docs/用户手册.md",
+    "docs/max-thinking.gif"
   ],
   "engines": {
     "node": ">=22"

@@ -2,7 +2,7 @@
 
 An opencode-inspired **terminal UI (TUI)** for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness), shipped as a dsh profile app plugin. It boots a chat client inside the dsh process: it creates/resumes agents through `ctx.agents`, renders the durable `session/event` stream (user messages, streaming assistant tokens, tool cards, todo lists), routes human input back via `agent.followup()`, and answers `approval/request` prompts inline.
 
-The UI follows a DeepSeek blue-white dark design language (brand blue `#4D6BFE` accents on a blue-tinted canvas, with a blue→white gradient on the DeepSeek Harness title): a responsive session rail, markdown transcript and tool activity, a bordered multiline composer with slash-command suggestions, and a telemetry footer for session tokens, average time to first token (TTFT), decode throughput, and KV-cache hit rate. Thinking and running tools (read/write/...) show flowing spinner animations, and the status row carries a flowing wave while the agent is working.
+The UI follows a DeepSeek blue-white dark design language (brand blue `#4D6BFE` accents on a blue-tinted canvas, with a blue→white gradient on the DeepSeek Harness title): a responsive session rail, markdown transcript and tool activity, a bordered multiline composer with slash-command suggestions, and a telemetry footer for session tokens, average time to first token (TTFT), decode throughput, KV-cache hit rate, and a **context meter** showing the current context length over the context-length limit. Thinking and running tools (read/write/...) show flowing spinner animations, and the status row carries a flowing wave while the agent is working.
 
 ![max thinking effect](docs/max-thinking.gif)
 
@@ -92,7 +92,7 @@ The launcher prefers an installed `dsh` on PATH and falls back to `npx --yes @de
 | Ctrl+L | clear the transcript view |
 | Up / Down | input history |
 | PgUp / PgDn | scroll the transcript |
-| Esc | close the effort slider / close help / cancel an approval prompt |
+| Esc | close the context-meter panel / effort slider / help, or cancel an approval prompt |
 | y / n | answer an inline approval prompt |
 
 ### Commands
@@ -145,6 +145,8 @@ dsh plugin --profile tui remove deepseek-harness-tui
 The settings menu projects the same Host settings namespaces used by the WebUI and persists changes through `ctx.settings` to `$DSH_HOME/settings.yaml`. It covers Busy Enter behavior, default agent and permission presets, default provider/model/reasoning effort, and session management. The default agent preset is chosen from the roster the profile mounts (`agent-presets`): the shipped presets plus any you authored under `$DSH_HOME/.agent-presets`; TUI sessions keep composing process-wide from the base, so the stored default only applies where a session is created from a preset. WebUI-only options (`ui-theme` Appearance and `locale` Language) are intentionally not shown because they have no effect inside the TUI. Provider credentials, API endpoints, and provider definitions are intentionally not editable in the TUI; use the settings document or WebUI for those changes.
 
 **Reasoning effort.** The effective effort value stays visible on the composer's top-right border, diagonally opposite the `provider · model` label. Press `Ctrl+E` to open a slider below the input box; `←`/`→` move it and persist the choice, `Esc` or `Ctrl+E` closes it. The slider is driven by the current model's actual selectable levels reported by the provider adapter (`ctx.llm.resolveModelInfo`), so a boolean-thinking model shows exactly its two ends, a full-range model shows every level it advertises, and a partial model (for example DeepSeek's `Off`/`High`/`Max`) shows only those — never a blanket `none → max` scale. At the strongest available level, the track gradient and bright sweep move left to right, the empty track shimmers, and the top-right effort text receives a flowing gradient with a pulsing text arrow. The Settings → Reasoning effort entry stays available as a list menu over the same levels. The chosen effort is applied to the session's requests through the `agent/request` waterfall and stored in `agent-default-model.reasoningEffort`.
+
+**Context meter.** The status row carries a live context-occupancy bar (`ctx ▓▓░░ 32K/128K 25%`) fed by the token-meter `contextPressure` projection, the same source as the Web UI's composer ring. It shows the current context length over the context-length limit once the provider reports both; the fill shifts toward the warning/error palette as occupancy climbs. Click the meter (or press `Esc` to close) to open a breakdown panel with the occupancy reading and the heuristic composition shares — system prompt, tools, and messages — matching the Web UI's ContextMeter dialog. The meter stays hidden when the profile lacks the token-meter projections.
 
 ## Plugin model
 

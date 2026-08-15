@@ -343,6 +343,59 @@ const rgbDist = (a, b) => Math.hypot(...hexRgb(a).map((v, i) => v - hexRgb(b)[i]
 ok("note palettes differ from thinking background", THEME.reminderBg !== THEME.compactionBg && THEME.reminderBg !== THEME.backgroundElement && THEME.compactionBg !== THEME.backgroundElement)
 ok("note backgrounds are visually distinct", rgbDist(THEME.reminderBg, THEME.backgroundElement) > 40 && rgbDist(THEME.compactionBg, THEME.backgroundElement) > 40 && rgbDist(THEME.reminderBg, THEME.compactionBg) > 40)
 
+// ---- context meter (web ContextMeter port) ----
+const meterApp = new App(fakeTerm)
+meterApp.setSession({ id: "t1", title: "Test" })
+meterApp.setContextMeter({})
+ok("no meter without pressure", meterApp.contextMeter === null)
+meterApp.setContextMeter({ pressure: { pressureTokens: 32_000 } })
+ok("no meter without capacity", meterApp.contextMeter === null)
+meterApp.setContextMeter({ pressure: { contextWindow: 128_000 } })
+ok("no meter without numerator", meterApp.contextMeter === null)
+meterApp.setContextMeter({
+  pressure: { pressureTokens: 32_000, contextWindow: 128_000 },
+  breakdown: { systemTokens: 120, toolsTokens: 21_500, messageTokens: 477_000 },
+})
+eq("meter occupancy percent", meterApp.contextMeter.percent, 25)
+const meterRendered = meterApp.render().cells.map((r) => r.map((c) => c.ch).join("")).join(NL2)
+const meterRow = meterRendered.split(NL2).at(-1)
+ok("meter reading in status row", meterRow.includes("ctx") && meterRow.includes("32K/128K") && meterRow.includes("25%"))
+ok("meter bar uses fill and track cells", meterRow.includes("█") && meterRow.includes("░"))
+ok("meter click target", meterApp.hitRegions.some((region) => region.kind === "context-meter"))
+// projectedTokens drives the reading so a compaction shows at once.
+const projectedApp = new App(fakeTerm)
+projectedApp.setSession({ id: "t1", title: "Test" })
+projectedApp.setContextMeter({ pressure: { pressureTokens: 32_000, projectedTokens: 3_000, contextWindow: 128_000 } })
+eq("meter follows projectedTokens", projectedApp.contextMeter.percent, 2)
+const projectedRow = projectedApp.render().cells.map((r) => r.map((c) => c.ch).join("")).join(NL2).split(NL2).at(-1)
+ok("meter reading shows projected figures", projectedRow.includes("3K/128K"))
+// Full context clamps at 100% and shifts the fill to the warning/error hue.
+const fullApp = new App(fakeTerm)
+fullApp.setSession({ id: "t1", title: "Test" })
+fullApp.setContextMeter({ pressure: { pressureTokens: 300_000, contextWindow: 128_000 } })
+eq("meter clamps at 100%", fullApp.contextMeter.percent, 100)
+// Click-open breakdown panel: headline, reading, segmented bar, legend.
+const panelApp = new App(fakeTerm)
+panelApp.setSession({ id: "t1", title: "Test" })
+panelApp.setContextMeter({
+  pressure: { pressureTokens: 32_000, contextWindow: 128_000 },
+  breakdown: { systemTokens: 120, toolsTokens: 21_500, messageTokens: 477_000 },
+})
+panelApp.contextMeterOpen = true
+const panelRendered = panelApp.render().cells.map((r) => r.map((c) => c.ch).join("")).join(NL2)
+ok("context panel headline", panelRendered.includes("context") && panelRendered.includes("used 25%"))
+ok("context panel figures", panelRendered.includes("~32K / 128K"))
+ok("context panel legend", panelRendered.includes("system prompt") && panelRendered.includes("tools") && panelRendered.includes("messages"))
+ok("context panel hidden behind settings", !panelRendered.includes("Settings") || panelRendered.includes("Esc close"))
+// Zero occupancy draws no fill segment but still shows the figures.
+const zeroApp = new App(fakeTerm)
+zeroApp.setSession({ id: "t1", title: "Test" })
+zeroApp.setContextMeter({ pressure: { pressureTokens: 0, contextWindow: 128_000 } })
+zeroApp.contextMeterOpen = true
+const zeroPanelRendered = zeroApp.render().cells.map((r) => r.map((c) => c.ch).join("")).join(NL2)
+ok("zero occupancy still shows figures", zeroPanelRendered.includes("~0 / 128K"))
+ok("context palette distinct", THEME.contextSystem !== THEME.contextTools && THEME.contextTools !== THEME.contextMessages)
+
 // Tool invocations surface their primary value without leaking JSON field names.
 const toolApp = new App(fakeTerm)
 toolApp.setSession({ id: "t1", title: "Test" })
