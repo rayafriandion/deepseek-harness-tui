@@ -266,6 +266,25 @@ ok("settings overlay", settingsRendered.includes("Settings") && settingsRendered
 ok("settings values", settingsRendered.includes("Default model") && settingsRendered.includes("gpt-5.6-luna"))
 ok("mouse settings targets", app.hitRegions.some((region) => region.kind === "settings-item" && region.settingsIndex === 0))
 
+// Focus follows the cursor: hovering a row moves the selection there, and
+// re-hovering the same row still refocuses it after the selection moved away
+// (keyboard, click, reopened list) — the hover cache must not go stale.
+const hoverApp = new App(fakeTerm)
+hoverApp.openSettings([
+  { kind: "session", label: "A", value: "a", sessionId: "a", disabled: false },
+  { kind: "session", label: "B", value: "b", sessionId: "b", disabled: false },
+  { kind: "session", label: "C", value: "c", sessionId: "c", disabled: false },
+], { title: "Manage sessions" })
+hoverApp.render()
+const hoverRows = hoverApp.hitRegions
+  .filter((region) => region.kind === "settings-item")
+  .sort((a, b) => a.settingsIndex - b.settingsIndex)
+ok("hover focuses row", hoverApp.hoverFocus(hoverRows[1].x + 1, hoverRows[1].y) && hoverApp.settingsSelection === 1)
+ok("hover idle within same row does not repaint", !hoverApp.hoverFocus(hoverRows[1].x + 2, hoverRows[1].y))
+hoverApp.settingsSelection = 0
+ok("re-hover same row refocuses", hoverApp.hoverFocus(hoverRows[1].x + 1, hoverRows[1].y) && hoverApp.settingsSelection === 1)
+ok("hover next row moves focus", hoverApp.hoverFocus(hoverRows[2].x + 1, hoverRows[2].y) && hoverApp.settingsSelection === 2)
+
 // Toast lives on the bottom status row, horizontally centered.
 const toastApp = new App(fakeTerm)
 toastApp.toast = { text: "saved to DSH settings", level: "info" }
