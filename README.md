@@ -4,6 +4,8 @@ An opencode-inspired **terminal UI (TUI)** for [DeepSeek Harness](https://github
 
 The UI follows a DeepSeek blue-white dark design language (brand blue `#4D6BFE` accents on a blue-tinted canvas, with a blue→white gradient on the DeepSeek Harness title): a responsive session rail, markdown transcript and tool activity, a bordered multiline composer with slash-command suggestions, and a telemetry footer for session tokens, average time to first token (TTFT), decode throughput, and KV-cache hit rate. Thinking and running tools (read/write/...) show flowing spinner animations, and the status row carries a flowing wave while the agent is working.
 
+![max thinking effect](docs/max-thinking.gif)
+
 中文用户手册见 [docs/用户手册.md](docs/用户手册.md)。
 
 ## Requirements
