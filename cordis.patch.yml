@@ -1,9 +1,9 @@
 # deepseek-harness-tui bundle patch: the terminal UI over the dsh-base layer.
-# Applied after dsh-base's insert. Rows reference this package by name, so the
-# package must be resolvable from the profile (installed via
-# `dsh plugin --profile tui add <this-dir>`, which links it into the profile's
-# node_modules) — or the profile's own patch may restate these rows with
-# absolute module paths (the zero-install bootstrap used before pnpm exists).
+# Rows reference this package by name, so the package must be resolvable from
+# the profile — the official path is `dsh plugin --profile tui add
+# deepseek-harness-tui`, which installs it into the profile's node_modules and
+# appends this bundle. The zero-install development bootstrap may instead
+# restate these rows in the profile's own patch with absolute module paths.
 
 - insert:
     - id: tui-startup
@@ -14,3 +14,11 @@
       config:
         sidebar: true
         showReasoning: true
+
+    # The preset roster behind the Settings -> Agent · Default preset list.
+    # Sessions keep composing process-wide from the base (single-session TUI);
+    # this row only makes the roster and its settings namespace available.
+    - id: agent-presets
+      name: '@deepseek-ai/dsh-agent-presets'
+      config:
+        default: standard

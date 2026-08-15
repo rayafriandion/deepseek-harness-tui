@@ -1,9 +1,12 @@
 {
   "name": "deepseek-harness-tui",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "description": "A terminal UI (TUI) for DeepSeek Harness — an opencode-inspired chat client that boots as a dsh profile app plugin.",
+  "scripts": {
+    "test": "node tests/smoke.test.mjs",
+    "check": "node --check lib/index.js && node --check lib/ui.js && node --check lib/term.js && node --check lib/metrics.js && node --check lib/interrupt.js && node --check lib/web-settings.js"
+  },
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
@@ -15,7 +18,8 @@
   "files": [
     "lib",
     "bin",
-    "cordis.patch.yml"
+    "cordis.patch.yml",
+    "docs/用户手册.md"
   ],
   "engines": {
     "node": ">=22"
@@ -24,6 +28,7 @@
     "@deepseek-ai/cordis": "*",
     "@deepseek-ai/dsh-agent": "*",
     "@deepseek-ai/dsh-agent-loop": "*",
+    "@deepseek-ai/dsh-agent-presets": "*",
     "@deepseek-ai/dsh-commands": "*",
     "@deepseek-ai/dsh-cmdline": "*",
     "@deepseek-ai/dsh-llm": "*",
@@ -31,42 +36,25 @@
     "@deepseek-ai/dsh-session-persistence": "*",
     "@deepseek-ai/dsh-user-approval": "*"
   },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": { "optional": false },
+    "@deepseek-ai/dsh-agent": { "optional": true },
+    "@deepseek-ai/dsh-agent-loop": { "optional": true },
+    "@deepseek-ai/dsh-agent-presets": { "optional": true },
+    "@deepseek-ai/dsh-commands": { "optional": true },
+    "@deepseek-ai/dsh-cmdline": { "optional": true },
+    "@deepseek-ai/dsh-llm": { "optional": true },
+    "@deepseek-ai/dsh-session": { "optional": true },
+    "@deepseek-ai/dsh-session-persistence": { "optional": true },
+    "@deepseek-ai/dsh-user-approval": { "optional": true }
+  },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
     }
   },
   "dependencies": {
-    "commander": "^15.0.0",
-    "@deepseek-ai/schemastery": "^0.1.0"
-  },
-  "peerDependenciesMeta": {
-    "@deepseek-ai/cordis": {
-      "optional": false
-    },
-    "@deepseek-ai/dsh-agent": {
-      "optional": true
-    },
-    "@deepseek-ai/dsh-agent-loop": {
-      "optional": true
-    },
-    "@deepseek-ai/dsh-commands": {
-      "optional": true
-    },
-    "@deepseek-ai/dsh-cmdline": {
-      "optional": true
-    },
-    "@deepseek-ai/dsh-llm": {
-      "optional": true
-    },
-    "@deepseek-ai/dsh-session": {
-      "optional": true
-    },
-    "@deepseek-ai/dsh-session-persistence": {
-      "optional": true
-    },
-    "@deepseek-ai/dsh-user-approval": {
-      "optional": true
-    }
+    "@deepseek-ai/schemastery": "^0.1.0",
+    "commander": "^15.0.0"
   }
 }
